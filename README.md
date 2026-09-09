@@ -1,6 +1,6 @@
 # 剪映语义自动剪辑（Jianying AutoEdit Agent）
 
-面向 Windows 与剪映专业版的 Codex Skill。它会先理解素材和事实，再决定如何剪，而不是把整段视频直接套模板、统一变速或让口播迁就错误画面。
+面向 Windows、macOS 与剪映专业版的 Codex Skill。它会先理解素材和事实，再决定如何剪，而不是把整段视频直接套模板、统一变速或让口播迁就错误画面。
 
 特别适合房产看房、空间导览、产品讲解，以及需要“事实准确、画面对应、口播自然”的竖屏视频。
 
@@ -16,6 +16,7 @@
 | --- | --- |
 | 事实与证据分离 | 区分用户提供的面积、价格、交通等事实与视频真正可见的空间证据，不从画面臆造信息 |
 | 完整看片 | 使用 FFprobe 获取媒体信息，并以固定间隔帧和场景变化帧覆盖整条素材 |
+| 双平台运行 | 自动识别 Windows/macOS；使用跨平台 Python 完成素材审查，并按当前系统进入对应剪映操作流程 |
 | 空间语义识别 | 识别玄关、厨房、餐厅、客厅、露台、景观、卧室、卫生间、道路和转场 |
 | 口播逐句对齐 | 为每句话记录对应场景、画面区间、口播起点、字幕起点和置信度 |
 | 连续走拍节奏 | 保留空间关系和进房动作，只压缩没有信息的等待、重复和走空段 |
@@ -66,6 +67,15 @@ flowchart LR
 - “主卧”“卫生间”等具名口播和字幕必须等对应空间清楚出现后再开始。
 - 实际拍到的餐厅/餐区必须单独识别，不能并入客厅后遗漏。
 
+## 平台支持
+
+| 平台 | 支持范围 | 注意事项 |
+| --- | --- | --- |
+| Windows | 素材扫描、蓝图、剪映界面执行、字幕、配音、配乐、导出审片 | 可用 Python 脚本或 PowerShell 包装脚本 |
+| macOS | 素材扫描、蓝图、剪映界面执行、字幕、配音、配乐、导出审片 | 实际控制剪映前需启用 Computer Use，并授予“屏幕录制”和“辅助功能”权限 |
+
+同一个仓库和 `$jianying-autoedit-agent` 调用名同时服务两个系统。Skill 会读取当前运行环境，不需要用户每次说明 Windows 还是 Mac。
+
 ## 安装
 
 在 Codex 新任务中输入：
@@ -102,16 +112,30 @@ $jianying-autoedit-agent
 使用 $jianying-autoedit-agent 审查当前剪映草稿，重点检查场景与口播、重复字幕、背景音乐、连续走拍和结尾是否冻结；保留原草稿并修正后重新导出。
 ```
 
+macOS 首次使用：
+
+```text
+使用 $jianying-autoedit-agent 在这台 Mac 上剪辑素材。先检查 macOS 的剪映、Computer Use 权限、Python 3 与 FFmpeg，再完整看片并按蓝图执行；不要使用 Windows 路径或快捷键。
+```
+
+### macOS 首次准备
+
+1. 安装 macOS 版剪映专业版并完成必要登录。
+2. 在 Codex/ChatGPT 桌面端启用 Computer Use，向系统授予“屏幕录制”和“辅助功能”权限；这是 Codex 读取和操作剪映界面的前提。参见 [OpenAI Computer Use 文档](https://learn.chatgpt.com/docs/computer-use)。
+3. 安装 Python 3、FFmpeg 和 FFprobe，并确认终端可运行 `python3 --version`、`ffmpeg -version` 与 `ffprobe -version`。使用 Homebrew 时可运行 `brew install python ffmpeg`。
+4. 按上方安装命令安装 Skill；如果未立即出现，重启 Codex。
+
 ## 运行依赖
 
 | 依赖 | 用途 |
 | --- | --- |
-| Windows | 当前剪映自动化工作流的目标系统 |
+| Windows 或 macOS | 当前剪映自动化工作流的目标系统 |
 | Codex 桌面端、CLI 或 IDE 扩展 | 加载和调用 Skill |
 | 剪映专业版 | 时间线、配音、智能字幕、智能包装、曲库和导出 |
 | FFmpeg / FFprobe | 读取媒体元数据、密集抽帧和导出验证 |
-| PowerShell | 运行素材审查脚本 |
-| Python 3 | 记录和检查 BGM 使用历史 |
+| Computer Use | 在 macOS 上读取和操作剪映界面；需要系统权限 |
+| Python 3 | 跨平台素材审查、记录和检查 BGM 使用历史 |
+| PowerShell（可选） | Windows 上运行兼容素材审查包装脚本 |
 
 ## 输出与中间文件
 
@@ -131,6 +155,7 @@ $jianying-autoedit-agent
 - 资料提到某个空间，不代表视频一定拍到了该空间；缺失画面不会由无关室内镜头冒充。
 - 交通信息可以使用用户提供并授权的道路素材；其他缺失内容应克制表达或省略。
 - “小帅”、智能包装和剪映音乐库的具体可用性取决于剪映版本、账号、会员状态和地区；不可用时选择最接近的可用方案并如实说明。
+- macOS 与 Windows 的按钮位置、快捷键和部分功能名称可能不同；Skill 以当前可见界面为准，不使用未经验证的固定坐标。
 - 本仓库不包含、不下载也不分发剪映曲库音乐。使用者需自行确认素材、音乐和成片的使用权。
 - 登录、付费、验证码和账号安全步骤仍需账号持有人处理。
 
@@ -152,6 +177,10 @@ $jianying-autoedit-agent
 
 统一变速会让房间展示和进房动作失去自然节奏。Skill 只压缩没有新信息的移动或等待区间，并将切点放在自然动作节点。
 
+### Mac 能直接使用吗？
+
+可以。安装地址和调用名与 Windows 相同。跨平台 Python 脚本负责素材扫描，macOS 专用流程负责界面差异；第一次实际操作剪映前必须完成 Computer Use 的“屏幕录制”和“辅助功能”授权。剪映版本、账号或地区缺少“小帅”、智能包装或某首音乐时，Skill 会按规则选择替代方案并说明。
+
 ## 项目结构
 
 ```text
@@ -161,10 +190,12 @@ jianying-autoedit-agent/
 │   └── openai.yaml
 ├── references/
 │   ├── jianying-build-and-audit.md
+│   ├── macos-operation.md
 │   ├── music-rotation.md
 │   └── scene-review-and-blueprint.md
 ├── scripts/
 │   ├── music-history.py
+│   ├── prepare-scene-review.py
 │   └── prepare-scene-review.ps1
 ├── LICENSE
 └── README.md
