@@ -22,4 +22,4 @@
 
 ## 历史文件
 
-默认保存到 `%USERPROFILE%\.codex\state\jianying-music-history.json`。字段包括曲名、项目、来源、首次/最近使用时间和累计次数。只有最终成片验证通过后才 `record`，失败导出或测试草稿不计入。
+默认保存到用户目录下的 `~/.codex/state/jianying-music-history.json`；Windows 会自动解析为对应的用户目录，macOS 使用 POSIX 路径。字段包括曲名、项目、来源、首次/最近使用时间和累计次数。只有最终成片验证通过后才 `record`，失败导出或测试草稿不计入。
