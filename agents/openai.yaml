@@ -1,0 +1,4 @@
+interface:
+  display_name: "剪映语义自动剪辑"
+  short_description: "先识别镜头内容，再按口播节奏剪辑并自动配乐"
+  default_prompt: "使用 $jianying-autoedit-agent，先完整扫描我提供的视频与事实资料，再按真实场景顺序完成口播对齐、剪映剪辑、智能字幕包装、配乐和审片导出。"
