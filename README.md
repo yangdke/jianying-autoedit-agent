@@ -71,7 +71,7 @@ flowchart LR
 在 Codex 新任务中输入：
 
 ```text
-$skill-installer 请从 https://github.com/iamcrisiloveyoutoo-commits/jianying-autoedit-agent 安装这个 Skill
+$skill-installer 请从 https://github.com/yangdke/jianying-autoedit-agent 安装这个 Skill
 ```
 
 安装完成后，在下一轮任务中使用：
