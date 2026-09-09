@@ -39,4 +39,6 @@ outputs/
 .idea/
 .vscode/
 .DS_Store
+.AppleDouble
+._*
 Thumbs.db
