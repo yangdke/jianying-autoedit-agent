@@ -1,11 +1,11 @@
 ---
 name: jianying-autoedit-agent
-description: 在 Windows 剪映专业版中完成基于事实资料与素材语义的自动剪辑。适用于先整理用户提供的事实、完整扫描视频、识别真实场景与动作、按画面顺序和有效时长重写口播、逐句匹配源区间、建立节奏时间线，再生成剪映配音/智能字幕、使用文本“智能包装”美化字幕、从剪映音乐库选择不重复的纯音乐并审片导出；尤其适合房产看房、空间导览、产品讲解和有明确事实资料的视频。
+description: 在 Windows 或 macOS 的剪映专业版中完成基于事实资料与素材语义的自动剪辑。适用于先整理事实、完整扫描视频、识别真实场景与动作、按画面顺序和有效时长重写口播、逐句匹配源区间、建立节奏时间线，再生成剪映配音与智能字幕、使用“智能包装”美化字幕、从剪映音乐库选择不重复的纯音乐并审片导出；尤其适合房产看房、空间导览、产品讲解和有明确事实资料的视频。
 ---
 
 # 剪映语义自动剪辑
 
-把 DaVinci 自动剪辑工作流的“素材审查、语义分段、蓝图、写入后审计”用于剪映。剪映只是执行端；不能因为素材已经在时间线里，就跳过内容识别并把整段视频统一变速来迁就旁白。
+把 DaVinci 自动剪辑工作流的“素材审查、语义分段、蓝图、写入后审计”用于 Windows 或 macOS 版剪映。剪映只是执行端；不能因为素材已经在时间线里，就跳过内容识别并把整段视频统一变速来迁就旁白。
 
 ## 必须达到的结果
 
@@ -20,6 +20,16 @@ description: 在 Windows 剪映专业版中完成基于事实资料与素材语�
 原素材不可修改。已有草稿先保存并备份；重大修改使用新草稿版本。
 
 房产视频未另行指定时，沿用源素材的竖屏 `9:16` 画幅，使用剪映年轻男声“小帅”和自然、清楚的房产介绍语气，并从剪映音乐库选择不过度抢声的纯音乐。若“小帅”、智能包装或目标音乐因剪映版本、账号或地区不可用，应选择最接近的可用方案并如实说明，不能无声跳过配音、字幕包装或 BGM。
+
+## 运行环境路由
+
+开始工作时先从当前运行环境识别操作系统，不要求用户重复说明：
+
+- Windows：可运行跨平台 Python 审查脚本，也可使用 `prepare-scene-review.ps1` 包装脚本；剪映写入仍通过当前可用的桌面控制能力完成。
+- macOS：读取 [macos-operation.md](references/macos-operation.md)，使用跨平台 Python 审查脚本；实际控制剪映前确认 Codex/ChatGPT 桌面端的 Computer Use 已启用，并具有“屏幕录制”和“辅助功能”权限。
+- 不依赖固定窗口坐标、Windows 专用快捷键、中文界面一定存在或某个按钮永远位于同一位置。应根据当前可见的应用名、版本、语言和控件文字操作；macOS 的撤销键是 `Command` 体系，但优先使用可见按钮和可读状态。
+- 不直接改写剪映内部草稿数据库或应用包内容。使用剪映界面导入、保存和导出，并在每个重大阶段读回时间线或预览验证。
+- 若当前只有命令行能力，仍可完成事实清单、素材扫描、场景地图、口播和蓝图；只有用户要求实际写入剪映而桌面控制不可用时，才把界面执行标记为待完成。
 
 ## 0. 房屋资料与事实层
 
@@ -36,7 +46,13 @@ description: 在 Windows 剪映专业版中完成基于事实资料与素材语�
 
 ## 1. 素材扫描与场景地图
 
-已有素材时直接只读扫描，不重复询问常规确认。先用 `ffprobe` 取得分辨率、帧率、时长、旋转信息和音频流，再运行：
+已有素材时直接只读扫描，不重复询问常规确认。先用 `ffprobe` 取得分辨率、帧率、时长、旋转信息和音频流，再运行跨平台脚本：
+
+```bash
+python3 ./scripts/prepare-scene-review.py --video <源视频> --output <项目/scene-review>
+```
+
+Windows 也可使用兼容包装脚本：
 
 ```powershell
 ./scripts/prepare-scene-review.ps1 -VideoPath <源视频> -OutputDir <项目/scene-review>
@@ -80,7 +96,7 @@ camera_motion,shot_quality,start_state,end_state,confidence,notes
 
 ## 3. 在剪映中执行并读回检查
 
-读取 [jianying-build-and-audit.md](references/jianying-build-and-audit.md)。使用剪映界面搭建蓝图中的多个独立片段，保持 9:16 源画幅，不拉伸。
+读取 [jianying-build-and-audit.md](references/jianying-build-and-audit.md)。在 macOS 上还必须读取 [macos-operation.md](references/macos-operation.md)。使用剪映界面搭建蓝图中的多个独立片段，保持 9:16 源画幅，不拉伸。
 
 声音优先级：配音/人物信息 > 必要环境声 > BGM。用户要求去原声时静音原声；否则只保留有价值的环境声。配音生成后，逐句复核它是否落在对应场景内；需要时调整画面切点，不让“厨房”口播配客厅、“露台”口播配卫生间。
 
@@ -94,8 +110,8 @@ camera_motion,shot_quality,start_state,end_state,confidence,notes
 
 1. 先查看近期选曲记录：
 
-   ```powershell
-   python ./scripts/music-history.py recent --limit 30
+   ```bash
+   python3 ./scripts/music-history.py recent --limit 30
    ```
 
 2. 在剪映音乐库搜索与主题匹配的纯音乐/轻音乐/氛围音乐，排除明显人声、强鼓点、版权状态异常或近期已经使用的曲目。
@@ -103,8 +119,8 @@ camera_motion,shot_quality,start_state,end_state,confidence,notes
 4. 插入后确认音频轨有波形、覆盖完整成片并在结尾淡出。旁白段 BGM 必须明显退位；实际试听，不以音量数值代替听感。
 5. 成片验证通过后记录剪映界面显示的准确曲名：
 
-   ```powershell
-   python ./scripts/music-history.py record --track "<曲名>" --project "<项目名>" --source "剪映音乐库"
+   ```bash
+   python3 ./scripts/music-history.py record --track "<曲名>" --project "<项目名>" --source "剪映音乐库"
    ```
 
 若剪映曲库不可访问、未登录、曲目不可用或会员限制，先尝试另一首可用纯音乐；仍失败时才使用用户合法本地音乐，并明确报告降级。不得无声跳过 BGM。
@@ -129,4 +145,4 @@ camera_motion,shot_quality,start_state,end_state,confidence,notes
 
 ## 硬阻塞
 
-只在素材不可读、`ffmpeg/ffprobe` 缺失且无法定位、剪映无法保存/导出、磁盘不足，或必须由账号持有人完成登录/付费时暂停。普通画面不完美、场景名称低置信度、某首音乐不可用都不是硬阻塞。
+只在素材不可读、`ffmpeg/ffprobe` 缺失且无法定位、剪映无法保存/导出、磁盘不足，或必须由账号持有人完成登录/付费时暂停。macOS 实际写入还要求 Computer Use 可用并获得“屏幕录制”和“辅助功能”权限；权限缺失时先完成不依赖界面的事实整理、扫描、口播与蓝图，再明确报告界面执行阻塞。普通画面不完美、场景名称低置信度、某首音乐不可用都不是硬阻塞。
