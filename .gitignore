@@ -1,0 +1,42 @@
+# Python and PowerShell caches
+__pycache__/
+*.py[cod]
+*.tmp
+*.log
+
+# Source and exported media
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.webm
+*.wav
+*.mp3
+*.m4a
+*.aac
+*.flac
+
+# Jianying drafts and generated review output
+drafts/
+exports/
+scene-review/
+fixed/
+scene-change/
+property-facts.json
+scene-map.csv
+edit-blueprint.json
+edit-blueprint.md
+narration-alignment.csv
+media-probe.json
+review-summary.json
+fixed-frames.csv
+jianying-music-history.json
+
+# Local work and editor state
+work/
+outputs/
+.venv/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
