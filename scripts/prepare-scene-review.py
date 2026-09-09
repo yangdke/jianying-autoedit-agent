@@ -12,9 +12,10 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+from typing import Optional
 
 
-def resolve_tool(explicit: str | None, name: str) -> str:
+def resolve_tool(explicit: Optional[str], name: str) -> str:
     if explicit:
         candidate = Path(explicit).expanduser()
         if candidate.is_file():
